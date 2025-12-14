@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Удосконалене переміщення обʼєктів</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: #eaeaea;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .object {
+      position: absolute;
+      cursor: grab;
+      transition: box-shadow 0.2s;
+    }
+
+    .object.active {
+      cursor: grabbing;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+
+    /* Квадрат */
+    #square {
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 0, 0, 0.5);
+      top: 60px;
+      left: 60px;
+    }
+
+    /* Коло */
+    #circle {
+      width: 100px;
+      height: 100px;
+      background: rgba(0, 255, 0, 0.5);
+      border-radius: 50%;
+      top: 60px;
+      left: 220px;
+    }
+
+    /* Трикутник */
+    #triangle {
+      width: 0;
+      height: 0;
+      border-left: 50px solid transparent;
+      border-right: 50px solid transparent;
+      border-bottom: 100px solid rgba(0, 0, 255, 0.5);
+      top: 60px;
+      left: 380px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="object" id="square"></div>
+  <div class="object" id="circle"></div>
+  <div class="object" id="triangle"></div>
+
+  <script>
+    let active = null;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    function getPoint(e) {
+      return e.touches ? e.touches[0] : e;
+    }
+
+    function startDrag(e) {
+      const point = getPoint(e);
+      active = e.currentTarget;
+
+      offsetX = point.clientX - active.offsetLeft;
+      offsetY = point.clientY - active.offsetTop;
+
+      active.classList.add('active');
+    }
+
+    function moveDrag(e) {
+      if (!active) return;
+
+      const point = getPoint(e);
+      let x = point.clientX - offsetX;
+      let y = point.clientY - offsetY;
+
+      const maxX = window.innerWidth - active.offsetWidth;
+      const maxY = window.innerHeight - active.offsetHeight;
+
+      x = Math.max(0, Math.min(maxX, x));
+      y = Math.max(0, Math.min(maxY, y));
+
+      requestAnimationFrame(() => {
+        active.style.left = x + 'px';
+        active.style.top = y + 'px';
+      });
+    }
+
+    function endDrag() {
+      if (!active) return;
+      active.classList.remove('active');
+      active = null;
+    }
+
+    document.querySelectorAll('.object').forEach(obj => {
+      obj.addEventListener('mousedown', startDrag);
+      obj.addEventListener('touchstart', startDrag);
+    });
+
+    document.addEventListener('mousemove', moveDrag);
+    document.addEventListener('touchmove', moveDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchend', endDrag);
+  </script>
+
+</body>
+</html>
