@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Переміщення об'єктів різної форми</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: #eeeeee;
+    }
+
+    .object {
+      position: absolute;
+      cursor: grab;
+    }
+
+    /* Квадрат */
+    #square {
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 0, 0, 0.5); /* напівпрозорий RGB */
+      top: 50px;
+      left: 50px;
+    }
+
+    /* Коло */
+    #circle {
+      width: 100px;
+      height: 100px;
+      background: rgba(0, 255, 0, 0.5);
+      border-radius: 50%;
+      top: 50px;
+      left: 200px;
+    }
+
+    /* Трикутник */
+    #triangle {
+      width: 0;
+      height: 0;
+      border-left: 50px solid transparent;
+      border-right: 50px solid transparent;
+      border-bottom: 100px solid rgba(0, 0, 255, 0.5);
+      top: 50px;
+      left: 350px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="object" id="square"></div>
+  <div class="object" id="circle"></div>
+  <div class="object" id="triangle"></div>
+
+  <script>
+    const objects = document.querySelectorAll('.object');
+    let activeObj = null;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    objects.forEach(obj => {
+      obj.addEventListener('mousedown', (e) => {
+        activeObj = obj;
+
+        // Для трикутника корекція координат
+        offsetX = e.clientX - obj.offsetLeft;
+        offsetY = e.clientY - obj.offsetTop;
+
+        obj.style.cursor = 'grabbing';
+      });
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!activeObj) return;
+
+      let x = e.clientX - offsetX;
+      let y = e.clientY - offsetY;
+
+      // Межі вікна браузера
+      x = Math.max(0, Math.min(window.innerWidth - activeObj.offsetWidth, x));
+      y = Math.max(0, Math.min(window.innerHeight - activeObj.offsetHeight, y));
+
+      activeObj.style.left = x + 'px';
+      activeObj.style.top = y + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (activeObj) {
+        activeObj.style.cursor = 'grab';
+        activeObj = null;
+      }
+    });
+  </script>
+
+</body>
+</html>
