@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Переміщення об'єктів</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: #f0f0f0;
+    }
+
+    .box {
+      width: 100px;
+      height: 100px;
+      position: absolute;
+      cursor: grab;
+      border-radius: 10px;
+    }
+
+    #box1 { background: red;   top: 50px;  left: 50px; }
+    #box2 { background: green; top: 50px;  left: 200px; }
+    #box3 { background: blue;  top: 50px;  left: 350px; }
+  </style>
+</head>
+<body>
+
+  <div class="box" id="box1"></div>
+  <div class="box" id="box2"></div>
+  <div class="box" id="box3"></div>
+
+  <script>
+    const boxes = document.querySelectorAll('.box');
+    let activeBox = null;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    boxes.forEach(box => {
+      box.addEventListener('mousedown', (e) => {
+        activeBox = box;
+        offsetX = e.clientX - box.offsetLeft;
+        offsetY = e.clientY - box.offsetTop;
+        box.style.cursor = 'grabbing';
+      });
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!activeBox) return;
+
+      let x = e.clientX - offsetX;
+      let y = e.clientY - offsetY;
+
+      // Обмеження межами вікна
+      x = Math.max(0, Math.min(window.innerWidth - activeBox.offsetWidth, x));
+      y = Math.max(0, Math.min(window.innerHeight - activeBox.offsetHeight, y));
+
+      activeBox.style.left = x + 'px';
+      activeBox.style.top = y + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (activeBox) {
+        activeBox.style.cursor = 'grab';
+        activeBox = null;
+      }
+    });
+  </script>
+
+</body>
+</html>
